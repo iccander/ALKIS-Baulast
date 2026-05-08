@@ -1,24 +1,31 @@
-<html><head><meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
-<meta name="robots" content="NOINDEX,NOFOLLOW"></head><body>
-<p><font face="Verdana"><font size="+1"><b>NAS-Fortführungsauftrag für Baulast generieren</b></font></p>
-<p>
-<form action="nas-export.php" method="get" accept-charset="UTF-8">
-
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex,nofollow">
+<title>NAS-FortfÃ¼hrungsauftrag fÃ¼r Baulast</title>
+</head>
+<body style="font-family:Verdana,sans-serif">
+<h2>NAS-FortfÃ¼hrungsauftrag fÃ¼r Baulast generieren</h2>
+<form action="nas-export.php" method="post" accept-charset="UTF-8">
 <label for="antrag">Antragsnummer BP:</label>
-<input type="text" size="20" id="antrag" name="antrag" required/>
-&nbsp;
-<label for="antrag">Art der Baulast:</label>
-<input type="text" size="33" id="name" name="name" required /> 
-<br/><br/>
-Bauaufsicht: <select name="ubab" required>
-    <option value="">auswählen</option>
-    <option value="3333">Stelle 3333</option>
-    <option value="4444">Stelle 4444</option>
+<input type="text" size="20" id="antrag" name="antrag" required> &nbsp;
+<label for="name">Art der Baulast:</label>
+<input type="text" size="33" id="name" name="name" required><br><br>
+<label for="ubab">Bauaufsicht:</label>
+<select id="ubab" name="ubab" required>
+	<option value="">auswÃ¤hlen</option>
+	<option value="3333">Stelle 3333</option>
+	<option value="4444">Stelle 4444</option>
 </select>  &nbsp; 
-Baulastnr.*: <input type="text" size="20" name="bez" /> &nbsp; 
-Eintragung*: <input type="date" size="10" name="date"/>
-<br/><br/>
-Umringskoordinaten:<br/>
-<textarea name="umring" rows="20" cols="100"></textarea>
-<br /><br /><input type="submit" value="Download NAS" /> &nbsp; <input type="reset" value="Zurücksetzen" /></form></p>
-*: <font size="-1">optionale Angaben</font></font></body></html>
+<label for="bez">Baulastnr.*:</label>
+<input type="text" size="20" id="bez" name="bez"> &nbsp; 
+<label for="date">Eintragung*:</label>
+<input type="date" id="date" name="date"><br><br>
+<label for="umring">Umringskoordinaten:</label><br>
+<textarea id="umring" name="umring" rows="20" cols="100" required></textarea>
+<br><br><input type="submit" value="Download NAS"> &nbsp; 
+<input type="reset" value="ZurÃ¼cksetzen"></form>
+*: <small>optionale Angaben</small>
+</body>
+</html>
