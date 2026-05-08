@@ -1,6 +1,7 @@
 <?php
-// Erkennungsmuster Koordinatenpaar (mit Komma und/oder Leerzeichen getrennt)
-const REGEX_KOO = '/([0-9]{7,8}\.[0-9]{3,4})\s*,?\s*([0-9]{7}\.[0-9]{3,4})/';
+const   // Erkennungsmuster Koordinatenpaar (mit Komma und/oder Leerzeichen getrennt)
+	REGEX_KOO = '/([0-9]{7,8}\.[0-9]{3,4})\s*,?\s*([0-9]{7}\.[0-9]{3,4})/',
+	REGEX_ARC = '/1e\+101\s*,?\s*([0-9]+\.[0-9]{3,4})/i'; // und Bogen ("1e+101")
 
 // Formatierte Koordinatenpaare für gml:posList
 function koo(array $umring, int $i): string {
@@ -24,6 +25,10 @@ if (!empty($_POST['umring'])) {
             $umring[] = ['hoch' => round((float)$match[2],3), // Hochwert auf mm runden
               'rechts' => round((float)substr($match[1],strpos($match[1],'.')-6),3)]; // Rechtswert 6-stellig ohne UTM-Zonennummer
         }
+        elseif (preg_match(REGEX_ARC, $row, $match)) {  //Bogenradius erkennen
+			if (($last = array_key_last($umring)) !== null) // nur wenn Array schon mit einem Koordinatenpaar befüllt ist
+				$umring[$last]['radius'] = (float)$match[1]; // letzten Arrayeintrag um 'radius' ergänzen 
+		}
     }
 }
 //NAS-Datei speichern
