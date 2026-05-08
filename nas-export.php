@@ -11,14 +11,14 @@ function xml($wert, $default = ''): string {
     return htmlspecialchars(trim($wert ?? $default),ENT_XML1|ENT_QUOTES,'UTF-8');
 }
 // Formular XML-safe auslesen 
-$antrag = xml($_REQUEST['antrag'],'0000000000');
-$ubab = xml($_REQUEST['ubab'],'0000');
-$name = xml($_REQUEST['name'],'Baulast');
-$bez = xml($_REQUEST['bez']);
-$date = $_REQUEST['date'] ?? '';
+$antrag = xml($_POST['antrag'],'0000000000');
+$ubab = xml($_POST['ubab'],'0000');
+$name = xml($_POST['name'],'Baulast');
+$bez = xml($_POST['bez']);
+$date = $_POST['date'] ?? '';
 $umring = [];
-if (!empty($_REQUEST['umring'])) {
-    foreach (preg_split('/\r\n|\r|\n/', $_REQUEST['umring']) as $row) {    //in Zeilen zerlegen
+if (!empty($_POST['umring'])) {
+    foreach (preg_split('/\r\n|\r|\n/', $_POST['umring']) as $row) {    //in Zeilen zerlegen
         // Koordinatenpaare erkennen (Trenner: Leerzeichen und/oder Komma)
         if (preg_match(REGEX_KOO, $row, $match)) {
             $umring[] = ['hoch' => round((float)$match[2],3), // Hochwert auf mm runden
