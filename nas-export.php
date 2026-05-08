@@ -1,31 +1,34 @@
 <?php
-// Startwerte
-$antrag ='0000000000'; $ubab = '0000'; $name = 'Baulast'; $bez = ''; $date = ''; $umring = [];
+// Erkennungsmuster Koordinatenpaar (mit Komma und/oder Leerzeichen getrennt)
+const REGEX_KOO = '/([0-9]{7,8}\.[0-9]{3,4})\s*,?\s*([0-9]{7}\.[0-9]{3,4})/';
 
 // Formatierte Koordinatenpaare für gml:posList
-function koo($umring, $i) { return
-        number_format($umring[$i]['rechts'],3,'.','').' '.
-        number_format($umring[$i]['hoch'],3,'.','');
+function koo(array $umring, int $i): string {
+	return sprintf('%.3f %.3f',$umring[$i]['rechts'],$umring[$i]['hoch']);
 }
-// Formular auslesen & Leerzeichen entfernen
-if(isset($_REQUEST['antrag'])) {$antrag = trim($_REQUEST['antrag']);}
-if(isset($_REQUEST['ubab'])) {$ubab = trim($_REQUEST['ubab']);}
-if(isset($_REQUEST['name'])) {$name = trim($_REQUEST['name']);}
-if(isset($_REQUEST['bez'])) {$bez = trim($_REQUEST['bez']);}
-if(isset($_REQUEST['date'])) {$date = $_REQUEST['date'];}
-if(isset($_REQUEST['umring'])){
+// XML-Sicherheit & Standardwerte
+function xml($wert, $default = ''): string {
+    return htmlspecialchars(trim($wert ?? $default),ENT_XML1|ENT_QUOTES,'UTF-8');
+}
+// Formular XML-safe auslesen 
+$antrag = xml($_REQUEST['antrag'],'0000000000');
+$ubab = xml($_REQUEST['ubab'],'0000');
+$name = xml($_REQUEST['name'],'Baulast');
+$bez = xml($_REQUEST['bez']);
+$date = $_REQUEST['date'] ?? '';
+$umring = [];
+if (!empty($_REQUEST['umring'])) {
     foreach (preg_split('/\r\n|\r|\n/', $_REQUEST['umring']) as $row) {    //in Zeilen zerlegen
         // Koordinatenpaare erkennen (Trenner: Leerzeichen und/oder Komma)
-        if (preg_match('/([0-9]{7,8}\.[0-9]{3,4})\s*,?\s*([0-9]{7}\.[0-9]{3,4})/', $row, $match)) {
-            $umring[] = ['hoch' => round((float)$match[2], 3), // Hochwert auf mm runden
-				// Rechtswert 6stellig ohne UTM-Zonennummer
-                'rechts' => round((float)substr($match[1],strpos($match[1],'.')-6),3)];
+        if (preg_match(REGEX_KOO, $row, $match)) {
+            $umring[] = ['hoch' => round((float)$match[2],3), // Hochwert auf mm runden
+              'rechts' => round((float)substr($match[1],strpos($match[1],'.')-6),3)]; // Rechtswert 6-stellig ohne UTM-Zonennummer
         }
     }
 }
-//NAS-Datei senden
+//NAS-Datei speichern
 header('Content-type: application/xml; charset=utf-8'); //UTF-8!
-header('Content-Disposition: attachment; filename=vFE_'.$antrag.'_001.xml');
+header('Content-Disposition: attachment; filename="vFE_'.preg_replace('/[^A-Za-z0-9_-]/','',$antrag).'_001.xml"'); //Header-Injection absichern
 echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 
 // NAS-XML-Vorspann direkt ausgeben
@@ -66,12 +69,12 @@ echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
                   <gml:exterior>
                     <gml:Ring>
 <?php // Ausgabe Liniensegmente
-for ($i = 0; $i < count($umring); $i++) { 
+for ($i = 0, $count = count($umring); $i < $count; $i++) {
 	echo '                      <gml:curveMember>
                         <gml:Curve gml:id="BDVI'.str_pad($i+1,4,'0',STR_PAD_LEFT).'">
                           <gml:segments>
                             <gml:LineStringSegment>
-                              <gml:posList>'.koo($umring, $i).' '.koo($umring,($i+1< count($umring))?$i+1:0).'</gml:posList>
+                              <gml:posList>'.koo($umring, $i).' '.koo($umring,($i+1)%$count).'</gml:posList>
                             </gml:LineStringSegment>
                           </gml:segments>
                         </gml:Curve>
@@ -88,18 +91,18 @@ for ($i = 0; $i < count($umring); $i++) {
           <ausfuehrendeStelle>
           <AX_Dienststelle_Schluessel>
             <land>12</land>          
-            <stelle><?php if (strlen($ubab)>0) { echo $ubab;}?></stelle>
+            <stelle><?=$ubab?></stelle>
           </AX_Dienststelle_Schluessel>
           </ausfuehrendeStelle>
-          <name><?php if (strlen($name)>0) { echo $name;}?></name>
-          <bezeichnung><?php if (strlen($bez)>0) { echo $bez;}?></bezeichnung>
-          <datumRechtskraeftig><?php if (strlen($date)>0) { echo $date;}?></datumRechtskraeftig>
+          <name><?=$name?></name>
+          <bezeichnung><?=$bez?></bezeichnung>
+          <datumRechtskraeftig><?=$date?></datumRechtskraeftig>
         </AX_BauRaumOderBodenordnungsrecht>
       </wfs:Insert>
     </wfs:Transaction>
   </geaenderteObjekte>
   <profilkennung/>
-  <antragsnummer><?php if (strlen($antrag)>0) { echo $antrag;}?></antragsnummer>
+  <antragsnummer><?=$antrag?></antragsnummer>
   <auftragsnummer/>
   <geometriebehandlung>false</geometriebehandlung>
   <mitTemporaeremArbeitsbereich>false</mitTemporaeremArbeitsbereich>
