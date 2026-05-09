@@ -1,7 +1,7 @@
 <?php
 const   // Erkennungsmuster Koordinatenpaar (mit Komma und/oder Leerzeichen getrennt)
 	REGEX_KOO = '/([0-9]{7,8}\.[0-9]{3,4})\s*,?\s*([0-9]{7}\.[0-9]{3,4})/',
-	REGEX_ARC = '/1e\+101\s*,?\s*([0-9]+\.[0-9]{3,4})/i'; // und Bogen ("1e+101")
+	REGEX_ARC = '/1e\+10([12])\s*,?\s*(-?[0-9]+\.[0-9]{3,4})/i'; // Radius v. rechtem bzw. linken Bogen (1e+101 bzw. 1e+102)
 
 // Formatierte Koordinatenpaare für gml:posList
 function koo(array $umring, int $i): string {
@@ -22,12 +22,13 @@ if (!empty($_POST['umring'])) {
     foreach (preg_split('/\r\n|\r|\n/', $_POST['umring']) as $row) {    //in Zeilen zerlegen
         // Koordinatenpaare erkennen (Trenner: Leerzeichen und/oder Komma)
         if (preg_match(REGEX_KOO, $row, $match)) {
-            $umring[] = ['hoch' => round((float)$match[2],3), // Hochwert auf mm runden
-              'rechts' => round((float)substr($match[1],strpos($match[1],'.')-6),3)]; // Rechtswert 6-stellig ohne UTM-Zonennummer
+            $umring[] = ['hoch' => (float)$match[2], //zum rechnen/runden als Zahl
+                       'rechts' => (float)substr($match[1],strpos($match[1],'.')-6)]; // 6-stellig ohne UTM-Zonennummer
         }
-        elseif (preg_match(REGEX_ARC, $row, $match)) {  //Bogenradius erkennen
-			if (($last = array_key_last($umring)) !== null) // nur wenn Array schon mit einem Koordinatenpaar befüllt ist
-				$umring[$last]['radius'] = (float)$match[1]; // letzten Arrayeintrag um 'radius' ergänzen 
+        elseif (preg_match(REGEX_ARC, $row, $match)) {         // Bogenradius und -richtung erkennen, aber
+			if (($last = array_key_last($umring)) !== null)    // nur wenn Array schon mit einem Koordinatenpaar befüllt ist,
+				$umring[$last]+=['radius' => (float)$match[2], // dann letzten Arrayeintrag um Radius  
+                'dir' => (int)$match[1]];                      // und Krümmungsrichtung (1 oder 2) ergänzen.
 		}
     }
 }
