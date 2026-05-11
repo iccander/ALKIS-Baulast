@@ -1,17 +1,15 @@
 # NAS-Fortführungsauftrag für Baulasten
 
-PHP-Skript zur Erzeugung von NAS-Fortführungsaufträgen für Baulasten aus Umringsdaten im Format von GEOgraf-Out-Dateien der Firma HHK.
+PHP-Skript zur Erzeugung von NAS-Fortführungsaufträgen für Baulasten mit Umringsdaten aus GEOgraf-Out-Dateien der Firma HHK.
 
 ## Funktionen
 
-Das Skript erzeugt aus eingegebenen Umringskoordinaten eine NAS-konforme XML-Datei (`AX_Fortfuehrungsauftrag`) zur Übernahme in AAA-/ALKIS-/NAS-Verfahren.
+Das Skript erzeugt aus eingegebenen Umringskoordinaten eine NAS-konforme XML-Datei (`AX_Fortfuehrungsauftrag`) zur Übernahme in AAA-/ALKIS-/NAS-Verfahren. 
 
 Unterstützt werden:
-
 - Gerade Liniensegmente
 - Rechts- und Linksbögen
 - automatische Berechnung von Bogenmittelpunkten
-- XML-sichere Verarbeitung von Eingabedaten
 
 ## Unterstützte Eingabedaten
 
@@ -31,6 +29,9 @@ Beispiel:
 Dabei wird:
 - der Hochwert vollständig übernommen
 - beim Rechtswert die führende UTM-Zonennummer entfernt
+- die Laufrichtung des Umrings (rechtsherum in GEOgraf, linksherum in ALKSI/GML) angepasst  
+
+Vorausgesetzt wird, dass die Umringe 
 
 ### Kreisbögen
 
