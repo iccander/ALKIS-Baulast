@@ -1,4 +1,3 @@
-3396178
 <?php
 // *** Konstanten *** //
 const   // Erkennungsmuster Koordinatenpaar (mit Komma und/oder Leerzeichen getrennt)
