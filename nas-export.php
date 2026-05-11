@@ -43,7 +43,7 @@ if (!empty($_POST['umring'])) {
     }
 } // *** NAS-Ausgabe *** //
 header('Content-type: application/xml; charset=utf-8');          // Datei speichern
-$safe = preg_replace('/[^A-Za-z0-9_-]/','',$antrag);             // Header-Injection absichern
+$safe = preg_replace('/[^\w %[\].()%&-]+/u','',$antrag);         // Header-Injection absichern, Umlaute erhalten
 header('Content-Disposition: attachment; filename="vFE_'.$safe.'_001.xml"; filename*=UTF-8\'\''.rawurlencode("vFE_{$safe}_001.xml"));
 echo '<?xml version="1.0" encoding="UTF-8"?>'."\n".'<!-- erzeugt mit bdvi-bb.de/baulast/ -->'."\n";
 // NAS-Vorspann direkt ausgeben ?>
