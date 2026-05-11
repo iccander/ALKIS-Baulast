@@ -4,10 +4,10 @@ const   // Erkennungsmuster Koordinatenpaar (mit Komma und/oder Leerzeichen getr
 	REGEX_KOO = '/([0-9]{7,8}\.[0-9]{3,4})\s*,?\s*([0-9]{7}\.[0-9]{3,4})/',
 	REGEX_ARC = '/1e\+10([12])\s*,?\s*(-?[0-9]+\.[0-9]{3,4})/i';   // Radius; rechter/linker Bogen (1e+101/1e+102)
 
+//***  Funktionen *** //
 function koo(array $punkt):string {           // auf 3 Nachkommastellen gerundete Koordinatenpaare für gml:posList
     return sprintf('%.3f %.3f', $punkt['rechts'], $punkt['hoch']);
 }
-//***  Funktionen *** //
 function bogenmitte(array $A,array $E):string{// Bogenmittenpunkt berechnen und ausgeben
     $D_h = $E['hoch']-$A['hoch'];             // Differenzvektor von ...
 	$D_r = $E['rechts']-$A['rechts'];         // ... A(nfangs-) zu E(ndpunkt)
@@ -22,6 +22,9 @@ function bogenmitte(array $A,array $E):string{// Bogenmittenpunkt berechnen und 
 }
 function xmlsafe($wert,$default=''):string {  // XML-Sicherheit & Standardwerte
     return htmlspecialchars(trim($wert ?? $default),ENT_XML1|ENT_QUOTES,'UTF-8');
+}
+function tab(int $einzug): string {           // XML-Einrückung
+    return str_repeat('  ', $einzug);
 }
 //***  Formular einlesen *** //
 $antrag = xmlsafe($_POST['antrag'],'0000000000');
@@ -83,7 +86,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>'."\n".'<!-- erzeugt mit bdvi-bb.de/
             </AA_Modellart>
           </modellart>
           <position>
-            <gml:Surface srsName="urn:adv:crs:ETRS89_UTM33" gml:id="BDVI0000">
+            <gml:Surface srsName="urn:adv:crs:ETRS89_UTM33" gml:id="BDVIBL0000">
               <gml:patches>
                 <gml:PolygonPatch>
                   <gml:exterior>
