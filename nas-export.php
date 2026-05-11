@@ -15,7 +15,7 @@ function bogenmitte(array $A,array $E):string{// Bogenmittenpunkt berechnen und 
     if (abs($A['radius']) < $sek2) return ''; // Test auf ungültige Geometrie (ohne: $sek == 0 → Sonderfall Kreis) 
     $M_h = ($A['hoch']+$E['hoch'])/2;         // M(ittelpunkt) ...
 	$M_r = ($A['rechts']+$E['rechts'])/2;     // ... der Sekante AE
-	$lot = sqrt(pow($A['radius'],2)-pow($sek2,2));  // Orthogonalabstand Kreismitte
+	$lot = sqrt(pow($A['radius'],2)-pow($sek2,2)); // Orthogonalabstand Kreismitte
 	$pfeil = abs($A['radius']-$lot);          // Pfeilhöhe (negativ bei überspanntem Bogen > 200 gon)
     $N_r = -$D_h/$sek; $N_h = $D_r/$sek;      // Einheits-Normalvektor
     return koo(['rechts' => $M_r+($pfeil*$N_r*$A['dir']),'hoch' => $M_h+($pfeil*$N_h*$A['dir'])]);
@@ -29,7 +29,8 @@ $ubab = xmlsafe($_POST['ubab'],'0000');
 $name = xmlsafe($_POST['name'],'Baulast');
 $bez = xmlsafe($_POST['bez']);
 $date = xmlsafe($_POST['date'] ?? '');
-$umring = [];
+$umringe = [[]];          // Container zur Aufnahme mehrerer Umringe (für gml:MultiSurface)
+$umring = &$umringe[0];   // Referenz auf jeweils aktuellen Umring (meist nur einer)
 if (!empty($_POST['umring'])) {
     foreach (array_reverse(preg_split('/\R/',$_POST['umring'])) as $row) { // in Zeilen zerlegen; von hinten wegen umgedrehter Laufrichtung in GML
         if (preg_match(REGEX_KOO, $row, $match)) {               // Koordinatenpaare erkennen (Trenner: Leerzeichen und/oder Komma)
@@ -39,9 +40,14 @@ if (!empty($_POST['umring'])) {
 			if (($last = array_key_last($umring)) !== null)      // nur wenn Array schon mit einem Koordinatenpaar befüllt ist,
 				$umring[$last] += ['radius' => (float)$match[2], // dann letzten Arrayeintrag um Radius ergänzen und  
                                    'dir' => 2*(int)$match[1]-3]; // inverse Krümmungsrichtung 1 (aus 1e+101) → -1 bzw. 2 (aus 1e+102) → +1
-		}
+		} elseif (!empty($umring)) { $umringe[] = [];            // weder Koordinate noch Bogen + aktueller Umring nicht leer → neuen Umring erzeugen
+			$umring = &$umringe[array_key_last($umringe)];       // und Referenz auf diesen neuen $umring setzen
+		} 
     }
-} // *** NAS-Ausgabe *** //
+	if (empty(end($umringe))) array_pop($umringe);               // leeren letzten Umring entfernen
+} $umring = &$umringe[0]; // provisorisch bis zur Implementierung der Ausgabe von MultiSurface zunächst Referenz auf ersten (meist einzigen) Umring setzen
+
+// *** NAS-Ausgabe *** //
 header('Content-type: application/xml; charset=utf-8');          // Datei speichern
 $safe = preg_replace('/[^\w %[\].()%&-]+/u','',$antrag);         // Header-Injection absichern, Umlaute erhalten
 header('Content-Disposition: attachment; filename="vFE_'.$safe.'_001.xml"; filename*=UTF-8\'\''.rawurlencode("vFE_{$safe}_001.xml"));
