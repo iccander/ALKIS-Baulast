@@ -35,6 +35,10 @@ function xmlsafe(?string $wert,string $default=''):string { // XML-Sicherheit & 
 function xml(string $tag,int $einzug=0):void { // XML-Einrückung
 echo str_repeat('  ',$einzug),"<",$tag,">\n";  // gibt rohe XML-Tags inkl. Inhalt aus
 }
+$id=1;                                         // fortlaufende GML-ID über alle neuen Flächen und Linien 
+function gmlid(int &$id):string {              // als Dummy-Identifikator
+    return ' gml:id="BDVIBL'.str_pad($id++,4,'0',STR_PAD_LEFT).'"';
+}
 // ***  Formular einlesen *** //
 $antrag = xmlsafe($_POST['antrag'],'0000000000');
 $ubab = xmlsafe($_POST['ubab']);
@@ -87,7 +91,7 @@ echo '<!-- BDVI-NAS-Generator für Baulasten 0.2, ',date('d.m.Y, H:i:s')," -->\n
           <gml:identifier codeSpace="http://www.adv-online.de/">urn:adv:oid:DE_BDVIBAULAST67</gml:identifier>
           <lebenszeitintervall>
             <AA_Lebenszeitintervall>
-              <beginnt>9999-01-01T00:00:00Z</beginnt>
+              <beginnt><?=gmdate('Y-m-d\TH:i:s\Z')?></beginnt>
             </AA_Lebenszeitintervall>
           </lebenszeitintervall>
           <modellart>
@@ -98,12 +102,11 @@ echo '<!-- BDVI-NAS-Generator für Baulasten 0.2, ',date('d.m.Y, H:i:s')," -->\n
           <position>
 <?
 $tab=5;  // Einrückungsebene ab <position>
-$id=0;   // fortlaufende GML-ID über alle Flächen und Linien 
 if ($multi=(count($umringe)>1))                           // mehrere Umringe für eine Baulast, Koordinatenreferenzsystem wird vererbt
-	xml('gml:MultiSurface'.UTM33.' gml:id="BDVIBL'.str_pad($id++,4,'0',STR_PAD_LEFT).'"',++$tab);
+	xml('gml:MultiSurface'.UTM33.gmlid($id),++$tab);
 foreach ($umringe as $umring) {
     if ($multi) xml('gml:surfaceMember',++$tab);          // neuer Umring bei mehreren Umringen 
-    xml('gml:Surface'.(!$multi ? UTM33 : '').' gml:id="BDVIBL'.str_pad($id++,4,'0',STR_PAD_LEFT).'"',++$tab);
+    xml('gml:Surface'.(!$multi ? UTM33 : '').gmlid($id),++$tab);
     xml('gml:patches',++$tab); xml('gml:PolygonPatch',++$tab);
     xml('gml:exterior',++$tab); xml('gml:Ring',++$tab);
                                                           // Ausgabe Linien- und Bogensegmente
