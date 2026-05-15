@@ -3,47 +3,104 @@
 <head>
 <meta charset="UTF-8">
 <meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NAS-Generator für Baulasten</title>
+<link rel="stylesheet" href="styles.css">
 </head>
-<body style="font-family:Verdana,sans-serif">
-<h2>NAS-Generator für Baulasten</h2>
+<body>
+<header>
+    <h1>NAS-Generator für Baulasten</h1>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/d/d4/BDVI-Logo.svg" alt="BDVI" class="logo">
+</header>
 <form action="nas-export.php" method="post" accept-charset="UTF-8">
-<label for="antrag">Antragsnummer BP:</label>
-<input type="text" size="20" id="antrag" name="antrag" required> &nbsp;
-<label for="name">Art der Baulast:</label>
-<input type="text" size="33" id="name" name="name" required><br><br>
-<label for="ubab">Bauaufsicht:</label>
-<select id="ubab" name="ubab" required>
-	<option value="">auswählen</option>
-	<option value="123360">Barnim</option>
-	<option value="123351">Brandenburg an der Havel</option>
-	<option value="123352">Cottbus</option>
-	<option value="123361">Dahme-Spreewald</option>
-	<option value="123362">Elbe-Elster</option>
-	<option value="123302">Eberswalde</option>
-	<option value="123353">Frankfurt (Oder)</option>
-	<option value="123363">Havelland</option>
-	<option value="123364">Märkisch-Oderland</option>
-	<option value="123365">Oberhavel</option>
-	<option value="123366">Oberspreewald-Lausitz</option>
-	<option value="123367">Oder-Spree</option>
-	<option value="123368">Ostprignitz-Ruppin</option>
-	<option value="123354">Potsdam</option>
-	<option value="123369">Potsdam-Mittelmark</option>
-	<option value="123370">Prignitz</option>
-	<option value="123301">Schwedt/Oder</option>
-	<option value="123371">Spree-Neiße</option>
-	<option value="123372">Teltow-Fläming</option>
-	<option value="123373">Uckermark</option>
-</select>  &nbsp; 
-<label for="bez">Baulastnr.*:</label>
-<input type="text" size="20" id="bez" name="bez"> &nbsp; 
-<label for="date">Eintragung*:</label>
-<input type="date" id="date" name="date"><br><br>
-<label for="umring">Umringskoordinaten:</label><br>
-<textarea id="umring" name="umring" rows="20" cols="100" required></textarea>
-<br><br><input type="submit" value="Download NAS"> &nbsp; 
-<input type="reset" value="Zurücksetzen"></form>
-*: <small>optionale Angaben</small>
+    <fieldset>
+        <legend>Allgemeine Angaben</legend>
+<div class="row">
+    <div class="half">
+        <label for="antrag">BP-Antragsnummer</label>
+        <input type="text" id="antrag" name="antrag" required autocomplete="off">
+    </div>
+    <div class="half">
+        <label for="ubab">Bauaufsicht</label>
+        <select id="ubab" name="ubab" required>
+		<option value="">auswählen</option>
+        	<option value="123360">Barnim</option>
+        	<option value="123351">Brandenburg an der Havel</option>
+        	<option value="123352">Cottbus</option>
+        	<option value="123361">Dahme-Spreewald</option>
+        	<option value="123362">Elbe-Elster</option>
+        	<option value="123302">Eberswalde</option>
+        	<option value="123353">Frankfurt (Oder)</option>
+        	<option value="123363">Havelland</option>
+        	<option value="123364">Märkisch-Oderland</option>
+        	<option value="123365">Oberhavel</option>
+        	<option value="123366">Oberspreewald-Lausitz</option>
+        	<option value="123367">Oder-Spree</option>
+        	<option value="123368">Ostprignitz-Ruppin</option>
+        	<option value="123354">Potsdam</option>
+        	<option value="123369">Potsdam-Mittelmark</option>
+        	<option value="123370">Prignitz</option>
+        	<option value="123301">Schwedt/Oder</option>
+        	<option value="123371">Spree-Neiße</option>
+        	<option value="123372">Teltow-Fläming</option>
+        	<option value="123373">Uckermark</option>
+        </select>
+    </div>
+</div>
+    </fieldset>
+    <div id="baulasten">
+        <fieldset class="baulast" id="baulast_1">
+            <legend>Baulast 1</legend>
+<div class="row">
+    <div class="third">
+        <label for="typ_1">Art der Baulast</label>
+        <input id="typ_1" name="typ[]" list="baulast_typen_1" placeholder="auswählen oder eingeben …">
+
+        <datalist id="baulast_typen_1">
+            <option value="Abstandsfläche">
+            <option value="Anbauverpflichtung">
+            <option value="Brandschutzabstand">
+            <option value="Erschließung">
+            <option value="Gemeinsame Bauteile">
+            <option value="Kinderspielplatz">
+            <option value="Kfz-Stellplatz">
+            <option value="Nutzungsmaßbeschränkung">
+            <option value="Vereinigung">
+        </datalist>
+    </div>
+    <div class="third">
+		<label for="bez_1">Baulastnummer*</label>
+        <input id="bez_1" name="bez[]">
+    </div>
+    <div class="third">
+        <label for="date_1">Rechtskraft*</label>
+        <input id="date_1" type="date" name="date[]">
+    </div>
+</div>
+<label for="umring_1">Umringskoordinaten</label>
+<textarea id="umring_1" name="umring[]" placeholder="Koordinatenliste" required></textarea>
+</fieldset>
+</div>
+<div class="controls-top">
+    <div class="optional">
+        * optionale Angaben
+    </div>
+    <div class="right-buttons">
+        <button type="button" id="removeBtn">
+            ➖ Baulast entfernen
+        </button>
+        <button type="button" id="addBtn">
+            ➕ Baulast hinzufügen
+        </button>
+    </div>
+</div>
+<div class="controls-bottom">
+    <button type="submit" class="download">
+        📥 NAS-Datei herunterladen
+    </button>
+</div>
+</form>
+<footer><br>Copyright (c) 2026 Frank Reichert / BDVI Brandenburg</footer>
+<script src="nas-export.js"></script>
 </body>
 </html>
