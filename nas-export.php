@@ -40,28 +40,36 @@ function gmlid(int &$id):string {              // als Dummy-Identifikator
     return ' gml:id="BDVIBL'.str_pad($id++,4,'0',STR_PAD_LEFT).'"';
 }
 // ***  Formular einlesen *** //
-$antrag = xmlsafe($_POST['antrag'],'0000000000');
+$antrag = xmlsafe($_POST['antrag'],'000000');  // allgemeine Werte
 $ubab = xmlsafe($_POST['ubab']);
-$name = xmlsafe($_POST['typ'][0],'Baulast');
-$bez = xmlsafe($_POST['bez'][0]);
-$date = xmlsafe($_POST['date'][0] ?? '');
-$umringe = [[]];          // Container zur Aufnahme mehrerer Umringe (für gml:MultiSurface)
-$umring = &$umringe[0];   // Referenz auf jeweils aktuellen Umring (meist nur einer)
-if (!empty($_POST['umring'][0])) {
-    foreach (preg_split('/\R/',$_POST['umring'][0]) as $row) {   // in Zeilen zerlegen
-        if (preg_match(REGEX_KOO, $row, $match)) {               // Koordinatenpaare erkennen (Trenner: Leerzeichen und/oder Komma)
-            $umring[] = ['hoch' => (float)$match[2],             // als Dezimalzahl (zum rechnen & runden)
-                       'rechts' => (float)substr($match[1],strpos($match[1],'.')-6)]; // 6-stellig ohne UTM-Zonennummer
-        } elseif (preg_match(REGEX_ARC, $row, $match)) {         // Bogenradius und -richtung erkennen, aber
-			if (($last = array_key_last($umring)) !== null)      // nur wenn Array schon mit einem Koordinatenpaar befüllt ist,
-				$umring[$last] += ['radius' => (float)$match[2], // dann letzten Arrayeintrag um Radius ergänzen und  
-                                   'dir' => 3-2*(int)$match[1]]; // Krümmungsrichtung 1 (aus 1e+101) → +1 bzw. 2 (aus 1e+102) → -1
-		} elseif (!empty($umring)) { $umringe[] = [];            // weder Koordinate noch Bogen + aktueller Umring nicht leer → neuen Umring erzeugen
-			$umring = &$umringe[array_key_last($umringe)];       // und Referenz auf diesen neuen $umring setzen
-		} 
-    } 
-	if (empty(end($umringe))) array_pop($umringe);               // leeren letzten Umring entfernen
-	unset($umring);                                              // Referenz lösen!
+$baulasten = [];                               // Gesamtarray zur Aufnahme aller Baulasten 
+$count = count($_POST['typ'] ?? []);           // Anzahl der Baulasten pro BP-Antragsnr./NAS-Datei (i.d.R. 1 bis 3)
+for ($b = 0; $b < $count; $b++) {              // alle Baulasten einlesen
+    $baulast = [
+		'typ' => xmlsafe($_POST['typ'][$b], 'Baulast'),
+        'bez' => xmlsafe($_POST['bez'][$b]),
+        'date' => xmlsafe($_POST['date'][$b]),
+        'umringe' => [] ];
+	$umringe = [[]];                                                 // Container zur Aufnahme mehrerer Umringe (für gml:MultiSurface)
+	$umring = &$umringe[0];                                          // Referenz auf jeweils aktuellen Umring (meist nur einer)
+    if (!empty($umringText = $_POST['umring'][$b] ?? '')) {          // Umring(e) dieser Baulast
+        foreach (preg_split('/\R/',$umringText) as $row) {           // in Zeilen zerlegen
+            if (preg_match(REGEX_KOO, $row, $match)) {               // Koordinatenpaare erkennen (Trenner: Leerzeichen und/oder Komma)
+                $umring[] = ['hoch' => (float)$match[2],             // als Dezimalzahl (zum rechnen & runden)
+                           'rechts' => (float)substr($match[1],strpos($match[1],'.')-6)]; // 6-stellig ohne UTM-Zonennummer
+            } elseif (preg_match(REGEX_ARC, $row, $match)) {         // Bogenradius und -richtung erkennen, aber
+    			if (($last = array_key_last($umring)) !== null)      // nur wenn Array schon mit einem Koordinatenpaar befüllt ist,
+    				$umring[$last] += ['radius' => (float)$match[2], // dann letzten Arrayeintrag um Radius ergänzen und  
+                                       'dir' => 3-2*(int)$match[1]]; // Krümmungsrichtung 1 (aus 1e+101) → +1 bzw. 2 (aus 1e+102) → -1
+    		} elseif (!empty($umring)) { $umringe[] = [];            // weder Koordinate noch Bogen + aktueller Umring nicht leer → neuen Umring erzeugen
+    			$umring = &$umringe[array_key_last($umringe)];       // und Referenz auf diesen neuen $umring setzen
+    		} 
+        } 
+    	if (empty(end($umringe))) array_pop($umringe);               // leeren letzten Umring entfernen
+    	unset($umring);                                              // Referenz lösen!
+    }
+	$baulast['umringe'] = $umringe;
+    $baulasten[] = $baulast;
 }
 // *** NAS-Ausgabe *** //
 header('Content-type: application/xml; charset=utf-8');          // Datei speichern
