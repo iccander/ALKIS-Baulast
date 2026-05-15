@@ -1,5 +1,5 @@
 <?
-/** NAS-Generator für Baulasten v. 0.2
+/** NAS-Generator für Baulasten v. 0.3
  **
  ** Copyright (c) 2026 Frank Reichert / BDVI Brandenburg
  **
@@ -42,13 +42,13 @@ function gmlid(int &$id):string {              // als Dummy-Identifikator
 // ***  Formular einlesen *** //
 $antrag = xmlsafe($_POST['antrag'],'0000000000');
 $ubab = xmlsafe($_POST['ubab']);
-$name = xmlsafe($_POST['name'],'Baulast');
-$bez = xmlsafe($_POST['bez']);
-$date = xmlsafe($_POST['date'] ?? '');
+$name = xmlsafe($_POST['typ'][0],'Baulast');
+$bez = xmlsafe($_POST['bez'][0]);
+$date = xmlsafe($_POST['date'][0] ?? '');
 $umringe = [[]];          // Container zur Aufnahme mehrerer Umringe (für gml:MultiSurface)
 $umring = &$umringe[0];   // Referenz auf jeweils aktuellen Umring (meist nur einer)
-if (!empty($_POST['umring'])) {
-    foreach (preg_split('/\R/',$_POST['umring']) as $row) {      // in Zeilen zerlegen
+if (!empty($_POST['umring'][0])) {
+    foreach (preg_split('/\R/',$_POST['umring'][0]) as $row) {   // in Zeilen zerlegen
         if (preg_match(REGEX_KOO, $row, $match)) {               // Koordinatenpaare erkennen (Trenner: Leerzeichen und/oder Komma)
             $umring[] = ['hoch' => (float)$match[2],             // als Dezimalzahl (zum rechnen & runden)
                        'rechts' => (float)substr($match[1],strpos($match[1],'.')-6)]; // 6-stellig ohne UTM-Zonennummer
@@ -68,7 +68,7 @@ header('Content-type: application/xml; charset=utf-8');          // Datei speich
 $safe = preg_replace('/[^\w %[\].()%&-]+/u','',$antrag);         // Header-Injection absichern, Umlaute erhalten
 header('Content-Disposition: attachment; filename="vFE_'.$safe.'_001.xml"; filename*=UTF-8\'\''.rawurlencode("vFE_{$safe}_001.xml"));
 echo '<?xml version="1.0" encoding="UTF-8"?>',"\n";
-echo '<!-- BDVI-NAS-Generator für Baulasten 0.2, ',date('d.m.Y, H:i:s')," -->\n";
+echo '<!-- BDVI-NAS-Generator für Baulasten 0.3, ',date('d.m.Y, H:i:s')," -->\n";
 // NAS-Vorspann direkt ausgeben ?>
 <AX_Fortfuehrungsauftrag xmlns="http://www.adv-online.de/namespaces/adv/gid/7.1" xmlns:adv="http://www.adv-online.de/namespaces/adv/gid/7.1" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:ogc="http://www.adv-online.de/namespaces/adv/gid/ogc" xmlns:fes="http://www.opengis.net/fes/2.0" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:wfs="http://www.opengis.net/wfs/2.0" xmlns:wfsext="http://www.adv-online.de/namespaces/adv/gid/wfsext/2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.adv-online.de/namespaces/adv/gid/7.1 NAS-Operationen.xsd">
   <empfaenger>
