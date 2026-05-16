@@ -9,8 +9,8 @@
  
  // *** Konstanten *** //
 const   // Erkennungsmuster Koordinatenpaar(mit Komma und/oder Leerzeichen getrennt)
-	REGEX_KOO = '/([0-9]{7,8}\.[0-9]{3,4})\s*,?\s*([0-9]{7}\.[0-9]{3,4})/',
-	REGEX_ARC = '/1e\+10([12])\s*,?\s*(-?[0-9]+\.[0-9]{3,4})/i',   // Radius; rechter/linker Bogen (1e+101/1e+102)
+	REGEX_KOO = '/(\d{7,8}\.\d{3,4})\s*,?\s*(\d{7}\.\d{3,4})/',
+	REGEX_ARC = '/1e\+10([12])\s*,?\s*(-?\d+\.\d{3,4})/i',   // Radius; rechter/linker Bogen (1e+101/1e+102)
 	UTM33 = ' srsName="urn:adv:crs:ETRS89_UTM33"';
 
 // ***  Funktionen ***  //
@@ -24,7 +24,7 @@ function bogenmitte(array $A,array $E):string{ // Bogenmittenpunkt berechnen und
     if ($sek == 0 || abs($A['radius']) <= $sek2) return '';  // Test auf ungültige Geometrie (sek=0 → unerlaubter Sonderfall Kreis)
     $M_h = ($A['hoch']+$E['hoch'])/2;          // M(ittelpunkt) ...
 	$M_r = ($A['rechts']+$E['rechts'])/2;      // ... der Sekante AE
-	$lot = sqrt($A['radius']**2 - $sek2**2);   // Orthogonalabstand Kreismitte
+	$lot = sqrt(max(0,$A['radius']**2-$sek2**2)); // Orthogonalabstand Kreismitte, numerische Stabilisierung
 	$pfeil = abs($A['radius']-$lot);           // Pfeilhöhe; abs() weil negativ bei überspanntem Bogen > 200 gon
     $N_r = -$D_h/$sek; $N_h = $D_r/$sek;       // Einheits-Normalvektor
     return koo(['rechts' => $M_r+($pfeil*$N_r*$A['dir']),'hoch' => $M_h+($pfeil*$N_h*$A['dir'])]);
@@ -37,18 +37,19 @@ echo str_repeat('  ',$einzug),"<",$tag,">\n";  // gibt rohe XML-Tags inkl. Inhal
 }
 $id=1;                                         // fortlaufende GML-ID über alle neuen Flächen und Linien 
 function gmlid(int &$id):string {              // als Dummy-Identifikator
-    return ' gml:id="BDVIBL'.str_pad($id++,4,'0',STR_PAD_LEFT).'"';
+	return ' gml:id="BDVI'.date('Ymd').str_pad($id++,4,'0',STR_PAD_LEFT).'"';
 }
 // ***  Formular einlesen *** //
 $antrag = xmlsafe($_POST['antrag'],'000000');  // allgemeine Werte
 $ubab = xmlsafe($_POST['ubab']);
 $baulasten = [];                               // Gesamtarray zur Aufnahme aller Baulasten 
-$count = count($_POST['typ'] ?? []);           // Anzahl der Baulasten pro BP-Antragsnr./NAS-Datei (i.d.R. 1 bis 3)
-for ($b = 0; $b < $count; $b++) {              // alle Baulasten einlesen
+$anzahl = count($_POST['typ'] ?? []);          // Anzahl der Baulasten pro BP-Antragsnr./NAS-Datei (i.d.R. 1 bis 3)
+for ($b = 0; $b < $anzahl; $b++) {             // alle Baulasten einlesen
     $baulast = [
 		'typ' => xmlsafe($_POST['typ'][$b], 'Baulast'),
         'bez' => xmlsafe($_POST['bez'][$b]),
         'date' => xmlsafe($_POST['date'][$b]),
+		'OID' => str_pad((string)($b+1),2,'0',STR_PAD_LEFT),
         'umringe' => [] ];
 	$umringe = [[]];                                                 // Container zur Aufnahme mehrerer Umringe (für gml:MultiSurface)
 	$umring = &$umringe[0];                                          // Referenz auf jeweils aktuellen Umring (meist nur einer)
@@ -72,8 +73,8 @@ for ($b = 0; $b < $count; $b++) {              // alle Baulasten einlesen
     $baulasten[] = $baulast;
 }
 // *** NAS-Ausgabe *** //
-header('Content-type: application/xml; charset=utf-8');          // Datei speichern
-$safe = preg_replace('/[^\w %[\].()%&-]+/u','',$antrag);         // Header-Injection absichern, Umlaute erhalten
+header('Content-type: application/xml; charset=utf-8');              // Datei speichern
+$safe = preg_replace('/[^\w %[\].()%&-]+/u','',$antrag);             // Header-Injection absichern, Umlaute erhalten
 header('Content-Disposition: attachment; filename="vFE_'.$safe.'_001.xml"; filename*=UTF-8\'\''.rawurlencode("vFE_{$safe}_001.xml"));
 echo '<?xml version="1.0" encoding="UTF-8"?>',"\n";
 echo '<!-- BDVI-NAS-Generator für Baulasten 0.3, ',date('d.m.Y, H:i:s')," -->\n";
@@ -95,11 +96,16 @@ echo '<!-- BDVI-NAS-Generator für Baulasten 0.3, ',date('d.m.Y, H:i:s')," -->\n
   <geaenderteObjekte>
     <wfs:Transaction version="2.0.0" service="WFS">
       <wfs:Insert>
-        <AX_BauRaumOderBodenordnungsrecht gml:id="DE_BDVIBAULAST67">
-          <gml:identifier codeSpace="http://www.adv-online.de/">urn:adv:oid:DE_BDVIBAULAST67</gml:identifier>
+<?php 
+$now = gmdate('Y-m-d\TH:i:s\Z');
+foreach ($baulasten as $baulast) {                  // Schleife über alle Baulasten 
+if (empty($baulast['umringe'][0])) continue;        // leere Baulast ohne Geometrie überspringen
+?>
+        <AX_BauRaumOderBodenordnungsrecht gml:id="DE_BDVIBAULAST<?=$baulast['OID']?>">
+          <gml:identifier codeSpace="http://www.adv-online.de/">urn:adv:oid:DE_BDVIBAULAST<?=$baulast['OID']?></gml:identifier>
           <lebenszeitintervall>
             <AA_Lebenszeitintervall>
-              <beginnt><?=gmdate('Y-m-d\TH:i:s\Z')?></beginnt>
+              <beginnt><?=$now?></beginnt>
             </AA_Lebenszeitintervall>
           </lebenszeitintervall>
           <modellart>
@@ -108,21 +114,20 @@ echo '<!-- BDVI-NAS-Generator für Baulasten 0.3, ',date('d.m.Y, H:i:s')," -->\n
             </AA_Modellart>
           </modellart>
           <position>
-<?
-$tab=5;  // Einrückungsebene ab <position>
-if ($multi=(count($umringe)>1))                           // mehrere Umringe für eine Baulast, Koordinatenreferenzsystem wird vererbt
-	xml('gml:MultiSurface'.UTM33.gmlid($id),++$tab);
-foreach ($umringe as $umring) {
+<?  $tab=5;                                               // Einrückungsebene ab <position>
+if ($multi = isset($baulast['umringe'][1]))               // existiert ein zweiter Umring?
+	xml('gml:MultiSurface'.UTM33.gmlid($id),++$tab);      // Koordinatenreferenzsystem wird vererbt!
+foreach ($baulast['umringe'] as $umring) {
     if ($multi) xml('gml:surfaceMember',++$tab);          // neuer Umring bei mehreren Umringen 
     xml('gml:Surface'.(!$multi ? UTM33 : '').gmlid($id),++$tab);
     xml('gml:patches',++$tab); xml('gml:PolygonPatch',++$tab);
     xml('gml:exterior',++$tab); xml('gml:Ring',++$tab);
                                                           // Ausgabe Linien- und Bogensegmente
-    for ($i = ($count = count($umring))-1;$i >= 0;$i--) { // rückwärts durchlaufen wegen umgekehrter Laufrichtung in GML
-		$A = $umring[($i + 1)%$count];                    // Kreisschluss durch Start beim letzten Punkt von hinten mit modulo
+    for ($i = ($punkte = count($umring))-1;$i >= 0;$i--){ // rückwärts durchlaufen wegen umgekehrter Laufrichtung in GML
+		$A = $umring[($i + 1)%$punkte];                   // Kreisschluss durch Start beim letzten Punkt von hinten mit modulo
 		$E = $umring[$i];
         xml('gml:curveMember',++$tab);                    // XML-Vorspann für Bogen oder Gerade gleich 
-        xml('gml:Curve gml:id="BDVIBL'.str_pad($id++,4,'0',STR_PAD_LEFT).'"',++$tab);
+        xml('gml:Curve'.gmlid($id),++$tab);
         xml('gml:segments',++$tab);
         if (isset($E['radius'])) { // ***** Kreisbogen ***** //
             xml('gml:Arc',++$tab);
@@ -153,10 +158,11 @@ foreach ($umringe as $umring) {
             <stelle><?=$ubab?></stelle>
           </AX_Dienststelle_Schluessel>
           </ausfuehrendeStelle>
-          <name><?=$name?></name>
-          <bezeichnung><?=$bez?></bezeichnung>
-          <datumRechtskraeftig><?=$date?></datumRechtskraeftig>
+          <name><?=$baulast['typ']?></name>
+          <bezeichnung><?=$baulast['bez']?></bezeichnung>
+          <datumRechtskraeftig><?=$baulast['date']?></datumRechtskraeftig>
         </AX_BauRaumOderBodenordnungsrecht>
+<?php } // Ende der Veranstaltung ?>
       </wfs:Insert>
     </wfs:Transaction>
   </geaenderteObjekte>
