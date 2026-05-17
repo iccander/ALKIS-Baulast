@@ -6,101 +6,113 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NAS-Generator für Baulasten</title>
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
 <header>
-    <h1>NAS-Generator für Baulasten</h1>
-    <img src="https://upload.wikimedia.org/wikipedia/commons/d/d4/BDVI-Logo.svg" alt="BDVI" class="logo">
+<h1>NAS-Generator für Baulasten</h1><img src="https://upload.wikimedia.org/wikipedia/commons/d/d4/BDVI-Logo.svg" alt="BDVI" class="logo">
 </header>
 <form action="nas-export.php" method="post" accept-charset="UTF-8">
-    <fieldset>
-        <legend>Allgemeine Angaben</legend>
-<div class="row">
+<fieldset>
+  <legend>Allgemeine Angaben</legend>
+  <div class="row">
     <div class="half">
-        <label for="antrag">BP-Antragsnummer</label>
-        <input type="text" id="antrag" name="antrag" required autocomplete="off">
+      <label for="antrag"><i class="bi bi-database-up"></i> BP-Antragsnummer</label>
+      <input type="text" id="antrag" name="antrag" required autocomplete="off">
     </div>
     <div class="half">
-        <label for="ubab">Bauaufsicht</label>
-        <select id="ubab" name="ubab" required>
-		<option value="">auswählen</option>
-        	<option value="123360">Barnim</option>
-        	<option value="123351">Brandenburg an der Havel</option>
-        	<option value="123352">Cottbus</option>
-        	<option value="123361">Dahme-Spreewald</option>
-        	<option value="123362">Elbe-Elster</option>
-        	<option value="123302">Eberswalde</option>
-        	<option value="123353">Frankfurt (Oder)</option>
-        	<option value="123363">Havelland</option>
-        	<option value="123364">Märkisch-Oderland</option>
-        	<option value="123365">Oberhavel</option>
-        	<option value="123366">Oberspreewald-Lausitz</option>
-        	<option value="123367">Oder-Spree</option>
-        	<option value="123368">Ostprignitz-Ruppin</option>
-        	<option value="123354">Potsdam</option>
-        	<option value="123369">Potsdam-Mittelmark</option>
-        	<option value="123370">Prignitz</option>
-        	<option value="123301">Schwedt/Oder</option>
-        	<option value="123371">Spree-Neiße</option>
-        	<option value="123372">Teltow-Fläming</option>
-        	<option value="123373">Uckermark</option>
-        </select>
+    <label for="ubab"><i class="bi bi-bank"></i> Bauaufsicht</label>
+    <select id="ubab" name="ubab" required>
+  	<option value="">auswählen</option>
+      <option value="123360">Barnim</option>
+      <option value="123351">Brandenburg an der Havel</option>
+      <option value="123352">Cottbus</option>
+      <option value="123361">Dahme-Spreewald</option>
+      <option value="123362">Elbe-Elster</option>
+      <option value="123302">Eberswalde</option>
+      <option value="123353">Frankfurt (Oder)</option>
+      <option value="123363">Havelland</option>
+      <option value="123364">Märkisch-Oderland</option>
+      <option value="123365">Oberhavel</option>
+      <option value="123366">Oberspreewald-Lausitz</option>
+      <option value="123367">Oder-Spree</option>
+      <option value="123368">Ostprignitz-Ruppin</option>
+      <option value="123354">Potsdam</option>
+      <option value="123369">Potsdam-Mittelmark</option>
+      <option value="123370">Prignitz</option>
+      <option value="123301">Schwedt/Oder</option>
+      <option value="123371">Spree-Neiße</option>
+      <option value="123372">Teltow-Fläming</option>
+      <option value="123373">Uckermark</option>
+    </select>
     </div>
-</div>
-    </fieldset>
-    <div id="baulasten">
-        <fieldset class="baulast" id="baulast_1">
-            <legend>Baulast 1</legend>
+  </div>
+</fieldset>
+<div id="baulasten">
+<fieldset class="baulast" id="baulast_1">
+<legend>Baulast 1</legend>
 <div class="row">
-    <div class="third">
-        <label for="typ_1">Art der Baulast</label>
-        <input id="typ_1" name="typ[]" list="baulast_typen_1" placeholder="auswählen oder eingeben …">
-
-        <datalist id="baulast_typen_1">
-            <option value="Abstandsfläche">
-            <option value="Anbauverpflichtung">
-            <option value="Brandschutzabstand">
-            <option value="Erschließung">
-            <option value="Gemeinsame Bauteile">
-            <option value="Kinderspielplatz">
-            <option value="Kfz-Stellplatz">
-            <option value="Nutzungsmaßbeschränkung">
-            <option value="Vereinigung">
-        </datalist>
-    </div>
-    <div class="third">
-		<label for="bez_1">Baulastnummer*</label>
-        <input id="bez_1" name="bez[]">
-    </div>
-    <div class="third">
-        <label for="date_1">Rechtskraft*</label>
-        <input id="date_1" type="date" name="date[]">
-    </div>
+  <div class="third">
+    <label for="typ_1"><i class="bi bi-houses"></i> Art der Baulast</label>
+    <input id="typ_1" name="typ[]" list="baulast_typen_1" placeholder="auswählen oder eingeben …">
+    <datalist id="baulast_typen_1">
+      <option value="Abstandsfläche">
+      <option value="Anbauverpflichtung">
+      <option value="Brandschutzabstand">
+      <option value="Erschließung">
+      <option value="Gemeinsame Bauteile">
+      <option value="Kinderspielplatz">
+      <option value="Kfz-Stellplatz">
+      <option value="Nutzungsmaßbeschränkung">
+      <option value="Vereinigung">
+    </datalist>
+  </div>
+  <div class="third">
+  <label for="bez_1"><i class="bi bi-card-list"></i> Baulastnummer*</label>
+    <input id="bez_1" name="bez[]">
+  </div>
+  <div class="third">
+    <label for="date_1"><i class="bi bi-calendar-date"></i> Rechtskraft*</label>
+    <input id="date_1" type="date" name="date[]">
+  </div>
 </div>
-<label for="umring_1">Umringskoordinaten</label>
+<label for="umring_1" class="umring-label"><i class="bi bi-crosshair2"></i> Umringskoordinaten<button type="button" class="info-btn"
+  onclick="document.getElementById('hint-umring').style.display='block'"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+  <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
+</svg></button></label>
 <textarea id="umring_1" name="umring[]" placeholder="Koordinatenliste" required></textarea>
+<div id="hint-umring" class="hint-popup">
+  <div class="hint-content">
+    <button type="button" class="close-btn" onclick="document.getElementById('hint-umring').style.display='none'">✖</button>
+    <h3>Hinweise zur Eingabe</h3>
+	<p><b>Umring</b><br>
+    <i class="bi bi-bootstrap-reboot"></i> im Uhrzeigersinn / rechtsherum<br>
+	<i class="bi bi-columns"></i> Leerzeile für neuen Umring (MultiSurface)<br>
+	<i class="bi bi-bounding-box"></i> offenes Polygon! Umring wird automatisch geschlossen.</p>
+    <p><b>Koordinatenpaare</b><br>
+	zeilenweise Eingabe:<br>
+    33458036.9636 5735099.7612<br>oder<br>
+    3458036.964, 5735099.761<br>oder<br>
+	 POS1: 3458036.9636,5735099.7612</p>
+    <p><b>Bogen</b><br>
+    1e+101,5.0000 → Rechtsbogen ↷<br>
+    1e+102,5.0000 → Linksbogen  ↶</p>
+    <p>Der Bogen bezieht sich jeweils auf den zuvor eingegebenen Punkt.</p>
+  </div>
+</div>
 </fieldset>
 </div>
 <div class="controls-top">
-    <div class="optional">
-        * optionale Angaben
-    </div>
-    <div class="right-buttons">
-        <button type="button" id="removeBtn">
-            ➖ Baulast entfernen
-        </button>
-        <button type="button" id="addBtn">
-            ➕ Baulast hinzufügen
-        </button>
-    </div>
+  <div class="optional"> * optionale Angaben</div>
+  <div class="right-buttons">
+    <button type="button" id="removeBtn"><i class="bi bi-trash"></i> Baulast entfernen</button>
+    <button type="button" id="addBtn"><i class="bi bi-plus-circle"></i> Baulast hinzufügen</button>
+  </div>
 </div>
-<div class="controls-bottom">
-    <button type="submit" class="download">
-        📥 NAS-Datei herunterladen
-    </button>
-</div>
+<div class="controls-bottom"><button type="submit" class="download"><i class="bi bi-download"></i> NAS-Datei herunterladen</button></div>
 </form>
-<footer><br>Copyright (c) 2026 Frank Reichert / BDVI Brandenburg</footer>
+<footer><br><i class="bi bi-c-circle"></i> 2026 Frank Reichert / BDVI Brandenburg</footer>
 <script src="nas-export.js"></script>
 </body>
 </html>
