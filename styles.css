@@ -19,12 +19,19 @@ margin:0 0 0 15px;
 font-size:1.4rem;
 font-weight:600;
 }
+h4{
+margin-bottom: 5px;
+}
 footer{
-margin:8px 4px;
+margin:24px 4px 4px 4px;
 max-width:600px;
 text-align:right;
 font-size:.8rem;
 color:#777;
+}
+a {
+  text-decoration: none;
+  color:#c45757;
 }
 .logo{
 height:58px;
@@ -48,7 +55,6 @@ label{
 display:block;
 margin-top:10px;
 font-weight:600;
-
 font-size:.9rem;
 }
 input,
@@ -172,6 +178,9 @@ padding: 0;
 margin: 0;
 line-height: 1;
 }
+.info-btn:hover{
+color:#4169E1;
+}
 .hint-popup {
 display: none;
 position: fixed;
@@ -188,6 +197,13 @@ border-radius: 10px;
 position: relative;
 box-shadow: 0 4px 20px rgba(0,0,0,0.25);
 }
+.hint-content code{
+display:inline-block;
+padding:2px 5px;
+background:#f3f3f3;
+border-radius:3px;
+font-size:.9em;
+}
 .close-btn {
 position: absolute;
 top: 0.5rem;
@@ -199,4 +215,21 @@ font-size: 1rem;
 }
 fieldset .row:first-of-type label{
 margin-top:0;
+}
+.baulast{
+overflow:hidden;
+transition:
+opacity .25s ease,
+transform .25s ease,
+height .25s ease,
+margin .25s ease,
+padding .25s ease;
+}
+.baulast.removing{
+opacity:0;
+transform:translateY(-9px);
+margin-top:0;
+margin-bottom:0;
+padding-top:0;
+padding-bottom:0;
 }
