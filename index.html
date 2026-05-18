@@ -53,8 +53,8 @@
 <legend>Baulast 1</legend>
 <div class="row">
   <div class="third">
-    <label for="typ_1"><i class="bi bi-houses"></i> Art der Baulast</label>
-    <input id="typ_1" name="typ[]" list="baulast_typen_1" placeholder="auswählen oder eingeben …">
+    <label for="typ_1"><i class="bi bi-houses"></i> Art/Name der Baulast</label>
+    <input  type="text" id="typ_1" name="typ[]" list="baulast_typen_1" placeholder="auswählen oder eingeben …">
     <datalist id="baulast_typen_1">
       <option value="Abstandsfläche">
       <option value="Anbauverpflichtung">
@@ -68,15 +68,15 @@
     </datalist>
   </div>
   <div class="third">
-  <label for="bez_1"><i class="bi bi-card-list"></i> Baulastnummer*</label>
-    <input id="bez_1" name="bez[]">
+  <label for="bez_1"><i class="bi bi-card-list"></i> Geschäftszeichen*</label>
+    <input type="text" id="bez_1" name="bez[]">
   </div>
   <div class="third">
-    <label for="date_1"><i class="bi bi-calendar-date"></i> Rechtskraft*</label>
+    <label for="date_1"><i class="bi bi-calendar-date"></i> Eintragung*</label>
     <input id="date_1" type="date" name="date[]">
   </div>
 </div>
-<label for="umring_1" class="umring-label"><i class="bi bi-crosshair2"></i> Umringskoordinaten<button type="button" class="info-btn"
+<label for="umring_1" class="umring-label"><i class="bi bi-crosshair2"></i> Umringskoordinaten<button type="button" class="info-btn" aria-label="Hinweise zur Koordinateneingabe öffnen"
   onclick="document.getElementById('hint-umring').style.display='block'"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
   <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
   <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
@@ -84,21 +84,21 @@
 <textarea id="umring_1" name="umring[]" placeholder="Koordinatenliste" required></textarea>
 <div id="hint-umring" class="hint-popup">
   <div class="hint-content">
-    <button type="button" class="close-btn" onclick="document.getElementById('hint-umring').style.display='none'">✖</button>
+    <button type="button" class="close-btn" aria-label="Hinweisfenster schließen" onclick="document.getElementById('hint-umring').style.display='none'">✖</button>
     <h3>Hinweise zur Eingabe</h3>
-	<p><b>Umring</b><br>
+	<h4>Umringe</h4>
     <i class="bi bi-bootstrap-reboot"></i> im Uhrzeigersinn / rechtsherum<br>
 	<i class="bi bi-file-break"></i> Leerzeile(n) für neuen Umring → <i class="bi bi-grid-1x2"></i> MultiSurface<br>
-	<i class="bi bi-bounding-box"></i> offenes Polygon! Umring wird automatisch geschlossen.</p>
-    <p><b>Koordinatenpaare</b><br>
+	<i class="bi bi-bounding-box"></i> offenes Polygon! Umring wird automatisch geschlossen.
+    <h4>Koordinatenpaare</h4>
 	<i class="bi bi-justify-left"></i>zeilenweise Eingabe:<br>
     <code>33458036.9636 5735099.7612</code><br>oder<br>
     <code>3458036.964, 5735099.761</code><br>oder<br>
-	<code>&nbsp;POS1: 3458036.9636,5735099.7612</code></p>
-    <p><b>Kreisbögen</b><br>
+	<code>&nbsp;POS1: 3458036.9636,5735099.7612</code>
+    <h4>Kreisbögen</h4>
     <code>1e+101,5.0000</code> → Rechtsbogen ↷<br>
-    <code>&nbsp;1e+102,5.000</code> → Linksbogen  ↶</p>
-    <p>Der Bogen bezieht sich jeweils auf den zuvor eingegebenen Punkt.</p>
+    <code>&nbsp;1e+102,5.000</code> → Linksbogen  ↶<br>
+    Der Bogen bezieht sich jeweils auf den zuvor eingegebenen Punkt.<br>Negative Radien bezeichnen überspannte Bögen > 200<sup>gon</sup>.
   </div>
 </div>
 </fieldset>
@@ -112,7 +112,7 @@
 </div>
 <div class="controls-bottom"><button type="submit" class="download"><i class="bi bi-download"></i> &nbsp;NAS-Download</button></div>
 </form>
-<footer><br><i class="bi bi-c-circle"></i> 2026 Frank Reichert / BDVI Brandenburg</footer>
+<footer><i class="bi bi-c-circle"></i> 2026 Frank Reichert / <a href="https://www.bdvi-brandenburg.de">BDVI Brandenburg</a></footer>
 <script src="nas-export.js"></script>
 </body>
 </html>
