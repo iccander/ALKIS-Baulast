@@ -153,16 +153,17 @@ foreach ($baulast['umringe'] as $umring) {
           </position>
           <artDerFestlegung>2610</artDerFestlegung>
           <ausfuehrendeStelle>
-          <AX_Dienststelle_Schluessel>
-            <land>12</land>          
-            <stelle><?=$ubab?></stelle>
-          </AX_Dienststelle_Schluessel>
+            <AX_Dienststelle_Schluessel>
+              <land>12</land>          
+              <stelle><?=$ubab?></stelle>
+            </AX_Dienststelle_Schluessel>
           </ausfuehrendeStelle>
           <name><?=$baulast['typ']?></name>
-          <bezeichnung><?=$baulast['bez']?></bezeichnung>
-          <datumRechtskraeftig><?=$baulast['date']?></datumRechtskraeftig>
-        </AX_BauRaumOderBodenordnungsrecht>
-<?php } // Ende der Veranstaltung ?>
+<?php                                        // Parser akzeptiert hier keine optional leeren Tags
+	!empty($baulast['bez']) && xml("bezeichnung>{$baulast['bez']}</bezeichnung",5);
+	!empty($baulast['date']) && xml("datumRechtskraeftig>{$baulast['date']}</datumRechtskraeftig",5);
+	xml('/AX_BauRaumOderBodenordnungsrecht',4);
+} // Ende der Veranstaltung ;-) ?>
       </wfs:Insert>
     </wfs:Transaction>
   </geaenderteObjekte>
