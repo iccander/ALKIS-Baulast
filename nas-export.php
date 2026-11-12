@@ -21,10 +21,10 @@ function bogenmitte(array $A,array $E):string{ // Bogenmittenpunkt berechnen und
     $D_h = $E['hoch']-$A['hoch'];              // Differenzvektor von ...
 	$D_r = $E['rechts']-$A['rechts'];          // ... A(nfangs-) zu E(ndpunkt)
     $sek2 = ($sek = hypot($D_r,$D_h))/2;       // (halbe) Sekante
-    if ($sek == 0 || abs($A['radius']) <= $sek2) return '';  // Test auf ungültige Geometrie (sek=0 → unerlaubter Sonderfall Kreis)
+    if ($sek === 0.0 || abs($A['radius']) <= $sek2) return '';  // Test auf ungültige Geometrie (sek=0 → unerlaubter Sonderfall Kreis)
     $M_h = ($A['hoch']+$E['hoch'])/2;          // M(ittelpunkt) ...
 	$M_r = ($A['rechts']+$E['rechts'])/2;      // ... der Sekante AE
-	$lot = sqrt(max(0,$A['radius']**2-$sek2**2)); // Orthogonalabstand Kreismitte, numerische Stabilisierung
+	$lot = sqrt(max(0.0,$A['radius']**2-$sek2**2)); // Orthogonalabstand Kreismitte, numerische Stabilisierung
 	$pfeil = abs($A['radius']-$lot);           // Pfeilhöhe; abs() weil negativ bei überspanntem Bogen > 200 gon
     $N_r = -$D_h/$sek; $N_h = $D_r/$sek;       // Einheits-Normalvektor
     return koo(['rechts' => $M_r+($pfeil*$N_r*$A['dir']),'hoch' => $M_h+($pfeil*$N_h*$A['dir'])]);
@@ -75,7 +75,7 @@ for ($b = 0; $b < $anzahl; $b++) {             // alle Baulasten einlesen
 // *** NAS-Ausgabe *** //
 header('Content-type: application/xml; charset=utf-8');              // Datei speichern
 $safe = preg_replace('/[^\w %[\].()%&-]+/u','',$antrag);             // Header-Injection absichern, Umlaute erhalten
-header('Content-Disposition: attachment; filename="vFE_'.$safe.'_001.xml"; filename*=UTF-8\'\''.rawurlencode("vFE_{$safe}_001.xml"));
+header('Content-Disposition: attachment; filename="FF_'.$safe.'.xml"; filename*=UTF-8\'\''.rawurlencode("FF_{$safe}.xml"));
 echo '<?xml version="1.0" encoding="UTF-8"?>',"\n";
 echo '<!-- BDVI-NAS-Generator für Baulasten 0.3, ',date('d.m.Y, H:i:s')," -->\n";
 // NAS-Vorspann direkt ausgeben ?>
