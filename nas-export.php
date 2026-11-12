@@ -1,4 +1,4 @@
-<?
+<?php
 /** NAS-Generator für Baulasten v. 0.3
  **
  ** Copyright (c) 2026 Frank Reichert / BDVI Brandenburg
@@ -40,15 +40,15 @@ function gmlid(int &$id):string {              // als Dummy-Identifikator
 	return ' gml:id="BDVI'.date('Ymd').str_pad($id++,4,'0',STR_PAD_LEFT).'"';
 }
 // ***  Formular einlesen *** //
-$antrag = xmlsafe($_POST['antrag'],'000000');  // allgemeine Werte
-$ubab = xmlsafe($_POST['ubab']);
+$antrag = xmlsafe($_POST['antrag'] ?? null,'000000');  // allgemeine Werte
+$ubab = xmlsafe($_POST['ubab'] ?? null);
 $baulasten = [];                               // Gesamtarray zur Aufnahme aller Baulasten 
 $anzahl = count($_POST['typ'] ?? []);          // Anzahl der Baulasten pro BP-Antragsnr./NAS-Datei (i.d.R. 1 bis 3)
 for ($b = 0; $b < $anzahl; $b++) {             // alle Baulasten einlesen
     $baulast = [
-		'typ' => xmlsafe($_POST['typ'][$b], 'Baulast'),
-        'bez' => xmlsafe($_POST['bez'][$b]),
-        'date' => xmlsafe($_POST['date'][$b]),
+		'typ' => xmlsafe($_POST['typ'][$b] ?? null, 'Baulast'),
+        'bez' => xmlsafe($_POST['bez'][$b] ?? null),
+        'date' => xmlsafe($_POST['date'][$b] ?? null),
 		'OID' => str_pad((string)($b+1),2,'0',STR_PAD_LEFT),
         'umringe' => [] ];
 	$umringe = [[]];                                                 // Container zur Aufnahme mehrerer Umringe (für gml:MultiSurface)
@@ -114,7 +114,7 @@ if (empty($baulast['umringe'][0])) continue;        // leere Baulast ohne Geomet
             </AA_Modellart>
           </modellart>
           <position>
-<?  $tab=5;                                               // Einrückungsebene ab <position>
+<?php  $tab=5;                                            // Einrückungsebene ab <position>
 if ($multi = isset($baulast['umringe'][1]))               // existiert ein zweiter Umring?
 	xml('gml:MultiSurface'.UTM33.gmlid($id),++$tab);      // Koordinatenreferenzsystem wird vererbt!
 foreach ($baulast['umringe'] as $umring) {
