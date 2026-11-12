@@ -29,9 +29,7 @@ Beispiel:
 Dabei wird:
 - der Hochwert vollständig übernommen
 - beim Rechtswert die führende UTM-Zonennummer entfernt
-- die Laufrichtung des Umrings (rechtsherum in GEOgraf, linksherum in ALKSI/GML) angepasst  
-
-Vorausgesetzt wird, dass die Umringe 
+- die Laufrichtung des Umrings (rechtsherum in GEOgraf, linksherum in ALKIS/GML) angepasst  
 
 ### Kreisbögen
 
@@ -57,14 +55,14 @@ Das Skript berechnet für Kreisbögen automatisch den Mittelpunkt auf dem Bogen.
 
 ## Ausgabe
 
-Erzeugt wird eine NAS/XML-Datei mit:
+Erzeugt wird eine NAS/XML-Fortführungsauftrag mit:
 
 - `gml:LineStringSegment`
 - `gml:Arc`
 
 inklusive:
 
-- Fortführungsauftrag
+- Antragsnummer zum Upload
 - Dienststellenschlüssel
 - Baulastinformationen
 - Geometrie
