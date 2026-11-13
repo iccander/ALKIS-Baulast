@@ -1,5 +1,5 @@
 <?php
-/** NAS-Generator für Baulasten v. 0.3
+/** NAS-Generator für Baulasten v. 0.4
  **
  ** Copyright (c) 2026 Frank Reichert / BDVI Brandenburg
  **
@@ -11,22 +11,23 @@
 const   // Erkennungsmuster Koordinatenpaar(mit Komma und/oder Leerzeichen getrennt)
 	REGEX_KOO = '/(\d{7,8}\.\d{3,4})\s*,?\s*(\d{7}\.\d{3,4})/',
 	REGEX_ARC = '/1e\+10([12])\s*,?\s*(-?\d+\.\d{3,4})/i',   // Radius; rechter/linker Bogen (1e+101/1e+102)
-	UTM33 = ' srsName="urn:adv:crs:ETRS89_UTM33"';
+	UTM33 = ' srsName="urn:adv:crs:ETRS89_UTM33"';           // fest auf UTM-Zone 33 codiert
 
 // ***  Funktionen ***  //
 function koo(array $P):string {                // auf 3 Nachkommastellen gerundete Koordinatenpaare für gml:posList
     return sprintf('%.3f %.3f',$P['rechts'],$P['hoch']);
 }
-function bogenmitte(array $A,array $E):string{ // Bogenmittenpunkt berechnen und ausgeben
-    $D_h = $E['hoch']-$A['hoch'];              // Differenzvektor von ...
-	$D_r = $E['rechts']-$A['rechts'];          // ... A(nfangs-) zu E(ndpunkt)
-    $sek2 = ($sek = hypot($D_r,$D_h))/2;       // (halbe) Sekante
-    if ($sek === 0.0 || abs($A['radius']) <= $sek2) return '';  // Test auf ungültige Geometrie (sek=0 → unerlaubter Sonderfall Kreis)
+function abst(array $A, array $E): float {     // euklidischer Abstand von 2 Punkten
+    return hypot($A['rechts'] - $E['rechts'], $A['hoch'] - $E['hoch']);
+}
+function bogenmitte(array $A,array $E):string{ // Bogenmittenpunkt berechnen und ausgeben	                                           
+	if (($sek=abst($A,$E))===0.0 || abs($A['radius'])<=($sek2=$sek/2)) return ''; // Test auf ungültige Geometrie (Sekante 0 → unerlaubter Sonderfall Kreis)
     $M_h = ($A['hoch']+$E['hoch'])/2;          // M(ittelpunkt) ...
 	$M_r = ($A['rechts']+$E['rechts'])/2;      // ... der Sekante AE
 	$lot = sqrt(max(0.0,$A['radius']**2-$sek2**2)); // Orthogonalabstand Kreismitte, numerische Stabilisierung
-	$pfeil = abs($A['radius']-$lot);           // Pfeilhöhe; abs() weil negativ bei überspanntem Bogen > 200 gon
-    $N_r = -$D_h/$sek; $N_h = $D_r/$sek;       // Einheits-Normalvektor
+	$pfeil = abs($A['radius']-$lot);           // Pfeilhöhe; abs() weil negativ bei überspanntem Bogen > 200 gon      
+    $N_r = -($E['hoch']-$A['hoch'])/$sek;      // Einheits-Normalvektor
+    $N_h = ($E['rechts']-$A['rechts'])/$sek; 
     return koo(['rechts' => $M_r+($pfeil*$N_r*$A['dir']),'hoch' => $M_h+($pfeil*$N_h*$A['dir'])]);
 }
 function xmlsafe(?string $wert,string $default=''):string { // XML-Sicherheit & Standardwerte
@@ -77,7 +78,7 @@ header('Content-type: application/xml; charset=utf-8');              // Datei sp
 $safe = preg_replace('/[^\w %[\].()%&-]+/u','',$antrag);             // Header-Injection absichern, Umlaute erhalten
 header('Content-Disposition: attachment; filename="FF_'.$safe.'.xml"; filename*=UTF-8\'\''.rawurlencode("FF_{$safe}.xml"));
 echo '<?xml version="1.0" encoding="UTF-8"?>',"\n";
-echo '<!-- BDVI-NAS-Generator für Baulasten 0.3, ',date('d.m.Y, H:i:s')," -->\n";
+echo '<!-- BDVI-NAS-Generator für Baulasten 0.4, ',date('d.m.Y, H:i:s')," -->\n";
 // NAS-Vorspann direkt ausgeben ?>
 <AX_Fortfuehrungsauftrag xmlns="http://www.adv-online.de/namespaces/adv/gid/7.1" xmlns:adv="http://www.adv-online.de/namespaces/adv/gid/7.1" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:ogc="http://www.adv-online.de/namespaces/adv/gid/ogc" xmlns:fes="http://www.opengis.net/fes/2.0" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:wfs="http://www.opengis.net/wfs/2.0" xmlns:wfsext="http://www.adv-online.de/namespaces/adv/gid/wfsext/2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.adv-online.de/namespaces/adv/gid/7.1 NAS-Operationen.xsd">
   <empfaenger>
@@ -126,6 +127,7 @@ foreach ($baulast['umringe'] as $umring) {
     for ($i = ($punkte = count($umring))-1;$i >= 0;$i--){ // rückwärts durchlaufen wegen umgekehrter Laufrichtung in GML
 		$A = $umring[($i + 1)%$punkte];                   // Kreisschluss durch Start beim letzten Punkt von hinten mit modulo
 		$E = $umring[$i];
+		if (abst($A,$E)<0.002) continue;                  // Null-Segmente (< 2 mm) überspringen; inkl. dopp. Schließpunkt bei geschlossenem Umring
         xml('gml:curveMember',++$tab);                    // XML-Vorspann für Bogen oder Gerade gleich 
         xml('gml:Curve'.gmlid($id),++$tab);
         xml('gml:segments',++$tab);
